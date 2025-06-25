@@ -17,7 +17,7 @@ int main() {
 
     // 1. Definir la Clave Secreta
     // Construimos la clave a partir de los datos del informe.
-    std::string hexKey = "6F708192A3B4C5D6E7F8A22023730521"; // Clave de 32 bytes (256-bit)
+    std::string hexKey = "6F708192A3B4C5D6E7F8A2202373052"; // Clave de 32 bytes (256-bit)
 
     // Usamos el tipo SecByteBlock de Crypto++ para almacenar la clave de forma segura.
     // Hay que ser explícitos: CryptoPP::SecByteBlock

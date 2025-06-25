@@ -4,6 +4,7 @@
 #include "rsa.h"
 #include "aes.h"
 #include "modes.h"
+#include "filters.h"
 #include "osrng.h"
 #include "files.h"
 #include "hex.h"
@@ -40,25 +41,30 @@ int main() {
     // --- PASO 3: El Gran Maestro descifra la clave AES con su clave privada RSA ---
     CryptoPP::SecByteBlock decryptedAesKey;
     try {
-        // 1. Cargar la clave privada en un objeto de clave privada.
+        CryptoPP::AutoSeededRandomPool prng;
+        std::cout<<1<<std::endl;
         CryptoPP::RSA::PrivateKey privateKey;
-        // La versión oficial de la librería debería poder leer el .pem sin problemas.
-        CryptoPP::FileSource fs("claves/gm_privada.pem", true);
+        CryptoPP::FileSource fs("claves/gm_privada.der", true, new HexDecoder);
+        std::cout<<2<<std::endl;
         privateKey.Load(fs);
+        std::cout<<3<<std::endl;
+        
+        CryptoPP::RSAES_OAEP_SHA_Decryptor decryptor(privateKey);
+        std::cout<<4<<std::endl;
 
-        // 2. Crear un objeto para descifrar USANDO el objeto de clave privada.
-        CryptoPP::RSAES_OAEP_SHA_Decryptor d(privateKey);
-
-        std::string recoveredKeyStr;
-
-        // 3. Usar el objeto de descifrado en el filtro.
-        CryptoPP::StringSource(encryptedAesKey, true,
-            new CryptoPP::PK_DecryptorFilter(rng, d,
-                new CryptoPP::StringSink(recoveredKeyStr)
+        std::ifstream file("test.txt");
+        std::string cipherText = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        std::cout<<5<<std::endl;
+        
+        std::string recoveredText;
+        std::cout<<6<<std::endl;
+        
+        CryptoPP::StringSource(cipherText, true,
+            new CryptoPP::PK_DecryptorFilter(prng, decryptor, // Usamos prng y decryptor
+                new CryptoPP::StringSink(recoveredText)   // El texto descifrado se guarda en recoveredText
             )
         );
-
-        decryptedAesKey.Assign(reinterpret_cast<const CryptoPP::byte*>(recoveredKeyStr.data()), recoveredKeyStr.size());
+        std::cout<<recoveredText<<std::endl;
 
     } catch (const CryptoPP::Exception& e) {
         std::cerr << "Error en Gran Maestro al descifrar la clave de sesión: " << e.what() << std::endl;
