@@ -1,3 +1,0 @@
-## USING FEDORA  42
-sudo dnf install g++
-sudo dnf install CryptoPP
