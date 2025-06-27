@@ -9,25 +9,21 @@
 #include "filters.h"
 #include "osrng.h"
 
-// NO usaremos 'using namespace CryptoPP;' para evitar ambigüedades
+// no se usará arcv por simpleza. Editar acá el mensaje sea de cambiar.
+std::string plainText = "La cámara descansa bajo el sauce llorón en el jardín del martillo.";
+
+// no se usarán namespaces por los conflictos
 
 int main() {
-    // ROL a utilizar (ejemplo de la carátula)
-    std::cout << "Usando ROL: 202373052-1" << std::endl; // [cite: 1]
-
     // 1. Definir la Clave Secreta
-    // Construimos la clave a partir de los datos del informe.
-    std::string hexKey = "6F708192A3B4C5D6E7F8A2202373052"; // Clave de 32 bytes (256-bit)
+    std::string hexKey = "6F708192A3B4C5D6E7F8A22023730521"; // 32 hex = 256 bits
 
-    // Usamos el tipo SecByteBlock de Crypto++ para almacenar la clave de forma segura.
-    // Hay que ser explícitos: CryptoPP::SecByteBlock
+    // Almacenar  clave segura
     CryptoPP::SecByteBlock key(reinterpret_cast<const CryptoPP::byte*>(hexKey.data()), hexKey.size());
 
-    // 2. Definir el Mensaje Secreto
-    std::string plainText = "La cámara descansa bajo el sauce llorón en el jardín del martillo."; // [cite: 17]
+    // 2. Declarar mensajes para encriptación
     std::string cipherText, encodedText;
 
-    std::cout << "\n--- Cifrado AES ---\n";
     std::cout << "Mensaje Original: " << plainText << std::endl;
     std::cout << "Clave usada (Hex): " << hexKey << std::endl;
 
