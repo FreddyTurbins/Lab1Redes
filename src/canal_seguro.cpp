@@ -18,11 +18,13 @@
 
 int main() {
     std::cout << "--- Simulación de Creación de Canal Seguro (Cifrado Híbrido) ---" << std::endl;
-    CryptoPP::AutoSeededRandomPool generador;
+    CryptoPP::AutoSeededRandomPool generador; // Generador de números aleatorios
 
+    // Genera una clave de sesión AES aleatoria de 128 bits
     CryptoPP::SecByteBlock claveSesion(CryptoPP::AES::DEFAULT_KEYLENGTH);
     generador.GenerateBlock(claveSesion, claveSesion.size());
 
+    // Convierte la clave a hexadecimal para mostrar
     std::string claveHex;
     CryptoPP::StringSource(claveSesion.data(), claveSesion.size(), true,
         new CryptoPP::HexEncoder(new CryptoPP::StringSink(claveHex))
@@ -31,12 +33,15 @@ int main() {
 
     std::string claveCifrada;
     try {
+        // Carga la clave pública RSA del Gran Maestro
         CryptoPP::RSA::PublicKey clavePublica;
         CryptoPP::FileSource archivo("claves/gm_publica_new.der", true);
         clavePublica.Load(archivo);
         
+        // Configura el cifrador RSA con OAEP-SHA
         CryptoPP::RSAES_OAEP_SHA_Encryptor cifradorRSA(clavePublica);
 
+        // Cifra la clave de sesión AES con RSA
         CryptoPP::StringSource(claveSesion.data(), claveSesion.size(), true,
             new CryptoPP::PK_EncryptorFilter(generador, cifradorRSA,
                 new CryptoPP::StringSink(claveCifrada)
@@ -50,12 +55,15 @@ int main() {
 
     CryptoPP::SecByteBlock claveDescifrada(CryptoPP::AES::DEFAULT_KEYLENGTH);
     try {
+        // Carga la clave privada RSA del Gran Maestro
         CryptoPP::RSA::PrivateKey clavePrivada;
         CryptoPP::FileSource archivoPrivado("claves/gm_privada_new.der", true);
         clavePrivada.Load(archivoPrivado);
 
+        // Configura el descifrador RSA con OAEP-SHA
         CryptoPP::RSAES_OAEP_SHA_Decryptor descifradorRSA(clavePrivada);
 
+        // Descifra la clave de sesión AES recibida de Pedrius
         std::string claveTemporal;
         CryptoPP::StringSource(claveCifrada, true,
             new CryptoPP::PK_DecryptorFilter(generador, descifradorRSA,
@@ -63,6 +71,7 @@ int main() {
             )
         );
 
+        // Copia la clave descifrada al bloque seguro
         if (claveTemporal.size() == CryptoPP::AES::DEFAULT_KEYLENGTH) {
             std::memcpy(claveDescifrada.data(), claveTemporal.data(), claveTemporal.size());
         } else {
@@ -74,12 +83,14 @@ int main() {
         return 1;
     }
 
+    // Convierte la clave descifrada a hexadecimal para verificación
     claveHex.clear();
     CryptoPP::StringSource(claveDescifrada.data(), claveDescifrada.size(), true,
         new CryptoPP::HexEncoder(new CryptoPP::StringSink(claveHex))
     );
     std::cout << "\n[Gran Maestro] PASO 3: Clave de sesión AES descifrada -> " << claveHex << std::endl;
 
+    // Verifica que ambas claves sean idénticas
     if (claveSesion == claveDescifrada) {
         std::cout << "[Sistema] ¡ÉXITO! Ambas partes ahora comparten la misma clave de sesión secreta." << std::endl;
     } else {
@@ -91,9 +102,11 @@ int main() {
     std::string mensajeCifrado;
 
     try {
+        // Configura el cifrador AES en modo ECB con la clave de sesión
         CryptoPP::ECB_Mode<CryptoPP::AES>::Encryption cifradorAES;
         cifradorAES.SetKey(claveSesion, claveSesion.size());
 
+        // Cifra el mensaje usando AES
         CryptoPP::StringSource(mensajeOriginal, true,
             new CryptoPP::StreamTransformationFilter(cifradorAES,
                 new CryptoPP::StringSink(mensajeCifrado)
@@ -101,6 +114,7 @@ int main() {
         );
         std::cout << "\n[Pedrius] Mensaje original: \"" << mensajeOriginal << "\"" << std::endl;
         
+        // Convierte el mensaje cifrado a hexadecimal
         std::string mensajeHex;
         CryptoPP::StringSource(mensajeCifrado, true, 
             new CryptoPP::HexEncoder(new CryptoPP::StringSink(mensajeHex))
@@ -113,9 +127,11 @@ int main() {
 
     std::string mensajeRecuperado;
     try {
+        // Configura el descifrador AES en modo ECB con la clave descifrada
         CryptoPP::ECB_Mode<CryptoPP::AES>::Decryption descifradorAES;
         descifradorAES.SetKey(claveDescifrada, claveDescifrada.size());
 
+        // Descifra el mensaje recibido
         CryptoPP::StringSource(mensajeCifrado, true,
             new CryptoPP::StreamTransformationFilter(descifradorAES,
                 new CryptoPP::StringSink(mensajeRecuperado)

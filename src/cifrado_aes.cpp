@@ -15,6 +15,7 @@ int main() {
     std::string mensajeOriginal = "La cámara descansa bajo el sauce llorón en el jardín del martillo.";
     std::string claveHex = "6F708192A3B4C5D6E7F8A22023730521";
     
+    // Convierte la clave hexadecimal en un bloque de bytes seguro
     CryptoPP::SecByteBlock clave(reinterpret_cast<const CryptoPP::byte*>(claveHex.data()), claveHex.size());
     std::string textoCifrado, textoHex;
 
@@ -22,9 +23,11 @@ int main() {
     std::cout << "Clave usada (Hex): " << claveHex << std::endl;
 
     try {
+        // Configura el cifrador AES en modo ECB
         CryptoPP::ECB_Mode<CryptoPP::AES>::Encryption cifrador;
-        cifrador.SetKey(clave, clave.size());
+        cifrador.SetKey(clave, clave.size()); // Establece la clave de cifrado
 
+        // Cifra el mensaje usando la cadena de filtros de Crypto++
         CryptoPP::StringSource(mensajeOriginal, true,
             new CryptoPP::StreamTransformationFilter(cifrador,
                 new CryptoPP::StringSink(textoCifrado)
@@ -35,6 +38,7 @@ int main() {
         return 1;
     }
 
+    // Convierte el texto cifrado a formato hexadecimal para visualización
     CryptoPP::StringSource(textoCifrado, true,
         new CryptoPP::HexEncoder(new CryptoPP::StringSink(textoHex))
     );
