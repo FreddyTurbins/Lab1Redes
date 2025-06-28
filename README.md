@@ -6,7 +6,9 @@ Todo se probó en Linux Fedora 42 y la WSL de windows 11. No nos hacemos cargo d
 dentro de /claves/ están las claves utilizadas para los cifrados asimétricos. Formato .pem en hexagecimal, y formato .der decimal.
 
 la compilación se logra corriendo:
+
 $ make
 
 la ejecución con:
+
 $ ./src/[nombre_del_ejecutable]
