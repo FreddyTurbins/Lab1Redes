@@ -1,40 +1,33 @@
+/*
+ * Programa de cifrado AES en modo ECB
+ * Cifra un mensaje usando una clave AES predefinida y muestra el resultado en hexadecimal
+ */
+
 #include <iostream>
 #include <string>
-
-// Cabeceras de Crypto++
 #include "cryptlib.h"
 #include "hex.h"
 #include "modes.h"
 #include "aes.h"
 #include "filters.h"
-#include "osrng.h"
-
-// no se usará arcv por simpleza. Editar acá el mensaje sea de cambiar.
-std::string plainText = "La cámara descansa bajo el sauce llorón en el jardín del martillo.";
-
-// no se usarán namespaces por los conflictos
 
 int main() {
-    // 1. Definir la Clave Secreta
-    std::string hexKey = "6F708192A3B4C5D6E7F8A22023730521"; // 32 hex = 256 bits
+    std::string mensajeOriginal = "La cámara descansa bajo el sauce llorón en el jardín del martillo.";
+    std::string claveHex = "6F708192A3B4C5D6E7F8A22023730521";
+    
+    CryptoPP::SecByteBlock clave(reinterpret_cast<const CryptoPP::byte*>(claveHex.data()), claveHex.size());
+    std::string textoCifrado, textoHex;
 
-    // Almacenar  clave segura
-    CryptoPP::SecByteBlock key(reinterpret_cast<const CryptoPP::byte*>(hexKey.data()), hexKey.size());
+    std::cout << "Mensaje Original: " << mensajeOriginal << std::endl;
+    std::cout << "Clave usada (Hex): " << claveHex << std::endl;
 
-    // 2. Declarar mensajes para encriptación
-    std::string cipherText, encodedText;
-
-    std::cout << "Mensaje Original: " << plainText << std::endl;
-    std::cout << "Clave usada (Hex): " << hexKey << std::endl;
-
-    // 3. Cifrar el Mensaje
     try {
-        CryptoPP::ECB_Mode<CryptoPP::AES>::Encryption e;
-        e.SetKey(key, key.size());
+        CryptoPP::ECB_Mode<CryptoPP::AES>::Encryption cifrador;
+        cifrador.SetKey(clave, clave.size());
 
-        CryptoPP::StringSource(plainText, true,
-            new CryptoPP::StreamTransformationFilter(e,
-                new CryptoPP::StringSink(cipherText)
+        CryptoPP::StringSource(mensajeOriginal, true,
+            new CryptoPP::StreamTransformationFilter(cifrador,
+                new CryptoPP::StringSink(textoCifrado)
             )
         );
     } catch(const CryptoPP::Exception& e) {
@@ -42,14 +35,10 @@ int main() {
         return 1;
     }
 
-    // 4. Codificar a Hexadecimal para mostrar
-    CryptoPP::StringSource(cipherText, true,
-        new CryptoPP::HexEncoder(
-            new CryptoPP::StringSink(encodedText)
-        )
+    CryptoPP::StringSource(textoCifrado, true,
+        new CryptoPP::HexEncoder(new CryptoPP::StringSink(textoHex))
     );
 
-    std::cout << "Mensaje Cifrado (Hex): " << encodedText << std::endl;
-
+    std::cout << "Mensaje Cifrado (Hex): " << textoHex << std::endl;
     return 0;
 }
