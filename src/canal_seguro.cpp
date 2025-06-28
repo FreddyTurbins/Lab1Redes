@@ -17,7 +17,7 @@
 #include "secblock.h"
 
 int main() {
-    std::cout << "--- Simulación de Creación de Canal Seguro (Cifrado Híbrido) ---" << std::endl;
+    std::cout << "--- Simulación de Creación de Canal Seguro ---" << std::endl;
     CryptoPP::AutoSeededRandomPool generador; // Generador de números aleatorios
 
     // Genera una clave de sesión AES aleatoria de 128 bits
@@ -92,9 +92,9 @@ int main() {
 
     // Verifica que ambas claves sean idénticas
     if (claveSesion == claveDescifrada) {
-        std::cout << "[Sistema] ¡ÉXITO! Ambas partes ahora comparten la misma clave de sesión secreta." << std::endl;
+        std::cout << "[Sistema] Ambas partes ahora comparten la misma clave de sesión secreta." << std::endl;
     } else {
-        std::cout << "[Sistema] ¡FALLO! Las claves no coinciden." << std::endl;
+        std::cout << "[Sistema] Las claves no coinciden." << std::endl;
         return 1;
     }
 
