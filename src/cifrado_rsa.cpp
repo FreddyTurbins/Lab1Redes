@@ -16,7 +16,6 @@ int main() {
     std::string textoCifrado, textoHex;
     std::string mensaje = "Los archivos antiguos, código MPSH476, revelan la ubicación del séptimo pergamino perdido.";
 
-    std::cout << "--- Cifrado RSA para el Gran Maestro ---" << std::endl;
     std::cout << "Mensaje Original: " << mensaje << std::endl;
 
     try {
@@ -40,7 +39,7 @@ int main() {
         new CryptoPP::HexEncoder(new CryptoPP::StringSink(textoHex))
     );
     
-    std::cout << "\n¡ÉXITO! Mensaje Cifrado (Hex):" << std::endl;
+    std::cout << "\nMensaje Cifrado :" << std::endl;
     std::cout << textoHex << std::endl;
     return 0;
 }

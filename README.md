@@ -1,4 +1,7 @@
 LABORATORIO 1 INF256 - 2025-1
+Simón Sobenes   202373098-k
+Bastián Jiménez 202373052-1
+Franco Cerda    202204018-1
 
 dentro dee /src/ están las fuentes y programas compilados a correr en WSL u otro sistema basado en UNIX.
 Todo se probó en Linux Fedora 42 y la WSL de windows 11. No nos hacemos cargo de diferencias en ejecución sobre otros sistemas operativos
